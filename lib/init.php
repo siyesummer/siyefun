@@ -14,8 +14,8 @@ define('CSS_PATH',ROOT_PATH . 'css/');
 $option = array
 	('host'=>'localhost',
 	'user'=>'root',
-	'pwd'=>'111',
-	'dbname'=>'liuyanban',
+	'pwd'=>'你的密码',
+	'dbname'=>'table名称',
 	'port'=>'3306',
 	'charset'=>'utf8'
 );
