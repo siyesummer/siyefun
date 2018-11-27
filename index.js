@@ -212,7 +212,7 @@ $(".topmenulist a").eq(1).click(function(){
 	console.log("音乐频道首页");
 });
 
-//音乐频道
+//电台频道
 $(".topmenulist a").eq(2).click(function(){
 	musList.radioInit();
 	console.log("心灵砒霜首页");
