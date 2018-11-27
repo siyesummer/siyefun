@@ -1,6 +1,10 @@
 /* CSS Document */
 
 /*大图片居中方法*/
+.siyecolor
+{
+	color:chocolate;
+}
 .example
 {
 	/*透明色*/
@@ -28,11 +32,27 @@
 {
 	margin: 0 -100%;
 }
-*
+
+/*伪元素清除浮动法*/
+.box
 {
-	margin: 0;
-	padding: 0;
+	/*兼容ie浏览器*/
+	*zoom:1;
 }
+
+.box::after
+{
+	content: '';
+	display: block;
+	height: 0;
+	visibility: hidden;
+	clear: both;
+}
+
+/*overflow:hidden也能清除浮动,且可以解决父元素无边框时子元素设置margin-top的同时父元素也会同时移动的问题*/
+
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td
+{margin:0;padding:0}
 
 .topbar
 {
@@ -55,7 +75,10 @@
 	width: 1180px;
 	position: relative;
 	margin: 0 auto;
+	
 }
+
+
 
 .topmenu img
 {
@@ -77,8 +100,38 @@
 {
 	display: inline-block;
 	width: 177px;
-	height: 100%;
+	line-height: 70px;
 	float: left;
+/*bootstrap修改了font-size和margin导致整体结构出错*/
+	font-size: 32px;
+	margin: 0;
+}
+
+.topmenu .topmenu_bg
+{
+	width: 80px;
+	height: 80px;
+	position: absolute;
+    top: -2px;
+    left: -8px;
+    display: block;
+	z-index: 5;
+}
+
+.topmenu_bg img
+{
+	width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+	
+}
+
+.topmenu_bg img:hover
+{
+	transform: none;
 }
 
 .topmenu .topmenulist
@@ -92,6 +145,7 @@
 .topmenulist li
 {
 	width: 100px;
+	height: 100%;
 	float: left;
 }
 
@@ -99,7 +153,7 @@
 {
 	background-color: #000000;
 	border-bottom: 3px solid #C20C0C;
-	box-sizing: border-box;
+	
 }
 
 .music_area
@@ -111,15 +165,18 @@
 	margin: 0 auto;
 	background-color:#FFFFFF;
 	margin-bottom: 50px;
+	position: relative;
+	
 }
 
-.musiclist
+.music_area .musiclist
 {
 	width: 500px;
 	height: 430px;
 	border-right: 1px solid #D3D3D3;
 	position: relative;
 	float: left;
+	
 }
 
 .musiclist a
@@ -133,6 +190,11 @@
 	height: 300px;
 	overflow-y: auto;
 	overflow-x: hidden;
+}
+
+.mus_comune table tr:nth-child(even)
+{
+	background-color: #F7F7F7;
 }
 
 .music_musproject
@@ -196,9 +258,9 @@
  
 }
 
-.musiclyc
+.music_area .musiclyc
 {
-	width: 379px;
+	width: 378px;
 	height: 430px;
 	position: relative;
 	float: left;
@@ -376,6 +438,50 @@
 	transform: rotateY(360deg) translateZ(120px);
 }
 
+
+.musiclyc .lyric
+{
+	width: 378px;
+	height: 180px;
+	overflow: hidden;
+	position: relative;
+	
+	margin: 0 auto;
+	margin-top: 50px;
+}
+
+.lyric #mask
+{
+	position: absolute;
+	width: 100%;
+	height: 8px;
+	left: 0;
+	top: 10;
+	background-color: pink;
+	opacity: 0.5;
+	z-index: 5;
+	filter: blur(10px);
+}
+
+.lyric ul 
+{
+	height: 100%;
+	text-align: center;
+}
+
+.lyric ul li
+{
+	list-style: none;
+	text-align: center;
+	font-weight: bold;
+	line-height: 25px;
+}
+
+.lyric .lyccur
+{
+	color:#C50C0C;
+}
+
 .playbar
 {
 	width: 100%;
@@ -492,6 +598,7 @@
 	
 	border-radius: 10px;
 	position: relative;
+	cursor: pointer;
 }
 
 .progressbar .rdy
@@ -546,7 +653,7 @@
 
 .play .curtime
 {
-	width: 75px;
+	width: 90px;
 	height: 14px;
 	position: absolute;
 	

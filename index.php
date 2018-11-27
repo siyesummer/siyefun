@@ -2,27 +2,33 @@
 <html>
 <head>
 <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>四叶音乐</title>
+
 <link rel="stylesheet" href="siyeMusic.css" type="text/css">
 
 </head>
-
+<body>
 <div class="topbar">
 	<div class="topmenu">
+		
 		<h1>
 			<a href="#"><img src="picture/4.jpg">四叶音乐</a>
+			<a href="#" class="topmenu_bg"><img src="https://i0.hdslb.com/bfs/face/1cdf174c75dd6493f3c8f0797e972b69e3293870.png@86w_86h.webp" class="topmenu_bg"></a>
 		</h1>
 		<ul class="topmenulist">
 			<li><a href="upload/UploadFile.php" target="_blank">上传音乐</a></li>
+			<li><a href="javascript:;" target="_blank">音乐频道</a></li>
+			<li><a href="javascript:;" target="_blank">心灵砒霜</a></li>
 		</ul>
 	</div>
 </div>
 <div class="music_area">
-	<div class="bg_66"></div>
 	<div class="musiclist">
 		<audio src="" id="mus_one"></audio>
 		<h3 style="text-align: center">音乐列表</h3>
-		首次加载歌曲需要10秒左右 &nbsp;5M音频上传需要30秒左右
+		<span>首次加载歌曲需要10秒左右 &nbsp;5M音频上传需要30秒左右</span>
 		<hr/>
 			
 		<div id="mus_list" style="text-align: center" class="mus_comune" data-mcs-theme="dark">
@@ -31,21 +37,21 @@
 		</div>
 		
 		<div class="music_musproject">
-			<span id="mus_time" style="color: silver">歌曲加载状态</span>
+			<span id="mus_time" style="color: silver">音频加载状态</span>
 				
 			<span id="ajax_hit"></span>
 		</div>
 		
 		<div class="music_page">
-			<input type="button" class="music_button" value="上一页" onClick="Jsonchange_page('before')">
+			<input type="button" class="music_button" value="上一页" onClick="">
 			<span> &nbsp;/&nbsp;</span>
-			<input type="button" class="music_button" value="下一页" onClick="Jsonchange_page('next')">
+			<input type="button" class="music_button" value="下一页" onClick="">
 		</div>
 	</div>
 	<div class="musiclyc">
-		<div class="lyc_pic">
+		<!--<div class="lyc_pic">
 			<img src="picture/1.jpg" id="lyc_picone" rot_ang=0 class="img_pause">
-		</div>
+		</div>-->
 		<div class="lyc_album">
 			<ul class="album_pause">
 				<li><img src="picture/album/1.jpg"></li>
@@ -54,6 +60,11 @@
 				<li><img src="picture/album/4.jpg"></li>
 				<li><img src="picture/album/5.jpg"></li>
 				<li><img src="picture/album/6.png"></li>
+			</ul>
+		</div>
+		<div class="lyric">
+			<!--<div id="mask" style="background-color: yellow"></div>-->
+			<ul>
 			</ul>
 		</div>
 	</div>
@@ -109,9 +120,14 @@
 </div>
 
 <div class=""></div>
-
+<div class="bg_66"></div>
 <script src="js/jquery-1.7.2/jquery.js"></script>
+<!--<script src="js/bootstrap.js"></script>-->
+<script src="siyeMusiclyc.js"></script>
+<script src="musProgress.js"></script>
+<script src="musPlay.js"></script>
+<!--<script src="siyeMusic.js"></script>-->
+<script src="index.js"></script>
 <script src="musicJsonList.js"></script>
-<script src="siyeMusic.js"></script>
 </body>
 </html>
