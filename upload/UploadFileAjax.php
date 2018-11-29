@@ -193,7 +193,7 @@ class Upload
 				
 				$total = $dao->fetchCou($sql_page_total);
 				$music_id = $total+1;
-				if($total>500)
+				if($total>100)
 				{
 					$hit_mes .= "音频已达数目设定上限，暂时无法继续上传;";
 					
@@ -226,7 +226,7 @@ class Upload
 				{
 					
 					
-					if($radio&&$file["size"]<($this->MaxAudsize*1))
+					if($radio&&$file["size"]<($this->MaxAudsize*6))
 					{
 						move_uploaded_file($file["tmp_name"],$this->radiofile_dir.$music_id.".mp3");
 						$hit_mes .= '电台文件上传成功;';
