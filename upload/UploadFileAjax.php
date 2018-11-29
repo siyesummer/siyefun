@@ -1,382 +1,330 @@
-﻿<?php
-//header("Cache-Control:no-cache");
-header("Content-Type:text/xml;charset=utf-8");
-require '../lib/init.php';
-$MaxPicsize   = 500000;//500K左右
-$MaxMussize   = 50000000;//50M左右
-$ajax_picfile = isset($_FILES["ajax_picfile"])?$_FILES['ajax_picfile']:'';
-$ajax_musfile = isset($_FILES["ajax_musfile"])?$_FILES['ajax_musfile']:'';
-$ajax_radiofile = isset($_FILES["ajax_radiofile"])?$_FILES['ajax_radiofile']:'';
-$ajax_password = isset($_POST["password"])?$_POST["password"]:'';
+<?php
+//header("Content-Type:text/xml;charset=utf-8");
+require 'lib/init.php';
 
-$picfile_dir   = "../picture/";
-$musfile_dir   = "../music/";
-$radiofile_dir = "../radio/";
-$is_file       = 'false';
-$mesinfo       = "<meses>";
-$mesinfo      .= "<hit_mes>";
-$hit_mes       = "提示信息:";
-$hit_mus       = "上传音乐提示";
-$mus_type      = '音频类型';
+$picfile = isset($_FILES["ajax_picfile"])?$_FILES['ajax_picfile']:'';
+$musfile = isset($_FILES["ajax_musfile"])?$_FILES['ajax_musfile']:'';
+$radiofile = isset($_FILES["ajax_radiofile"])?$_FILES['ajax_radiofile']:'';
+$password = isset($_POST["password"])?$_POST["password"]:'';
 
-$isTrue = 'false';
+$isRadio = false;//判断是否是电台文件
 
-
-//echo "<hit_mes>厉害了</hit_mes>";
-//exit;
-//echo "<meses><isTrue>".$isTrue."</isTrue></meses>";
-//echo "<meses><isTrue>你说啥</isTrue></meses>";
-	//exit;
-if($ajax_password)
+class Upload
 {
-	$sql = "select *from password_info where password='$ajax_password' ";
+	public $picfile_dir   = "../picture/";//图片文件存储路径
+	public $musfile_dir   = "../music/";//音乐音频文件存储路径
+	public $radiofile_dir = "../radio/";//电台音频文件存储路径
+	public $isFile        = 'false';//是否有文件
+	public $isUpload      = 'false';
+	public $isTrue        = 'false';//判断口令是否正确
+	public $fileType      = 'none';//文件类型
+	public $fileDir       = '文件路径初始化';
+	public $fileName      = '文件名初始化';
+	public $MaxPicsize    = 500000;//500K左右
+	public $MaxAudsize    = 50000000;//50M左右
 	
-	$total = $dao_mysqli->fetchCou($sql);
-	
-	if($total>0)
+	//为带有中文名称的文件进行编码设置
+	function escape($str) 
 	{
-		$isTrue = 'true';
+		//str_replace("world","Shanghai","Hello world!");
+	    $a = str_replace('\\', '%', substr(json_encode($str), 1, -1));
+	    $b = str_replace('%','a',$a);
+		return $b;
 	}
-	echo "<isTrue>".$isTrue."</isTrue>";
+	function unescape($str) 
+	{
+	  return json_decode('"'.str_replace('%', '\\', $str).'"');
+	}
+	
+	//判断是否是图片
+	function isPicture($file)
+	{
+		if($file
+			&&(($file["type"]=="image/gif")
+			||($file["type"]=="image/jpeg")
+			||($file["type"]=="image/pjpeg")
+			||($file["type"]=="image/png"))
+	  	)
+			{
+				return true;
+			}
+		
+		return false;
+	}
+	
+	//判断是否是音频
+	function isAudio($file)
+	{
+		if($file
+		   &&(($file['type']=='audio/mp3')
+			  ||($file['type']=='audio/wav')
+			  ||($file['type']=='audio/mpeg'))
+		  )
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	//检测是否有信息
+	function isBlank($pic,$mus,$rad,$pwd)
+	{
+		//echo $this->picfile_dir;
+		
+		if (($pic=='')&&($mus=='')&&($rad=='')&&($pwd==''))
+			{
+				$res['hit_mes']   = '没有选择文件';
+				$res['is_file']   = $this->isFile;
+				$res['is_upload'] = $this->isUpload;
+				$res['file_type'] = $this->fileType;
+				$res['file_dir']  = $this->fileDir;
+				$res['file_name'] = $this->fileName;
+				echo json_encode($res);
+				exit;
+			}
+	}
+	
+	//检测口令
+	function isPass($pwd,$dao)
+	{
+		$sql = "select *from password_info where password='$pwd' ";
+
+		$total = $dao->fetchCou($sql);
+
+		if($total>0)
+		{
+			//$this->isTrue = 'true';
+			return true;
+		}
+		return false;
+	}
+	
+	//上传文件
+	function uploadFile($file,$dao,$radio)
+	{
+		$hit_mes = '提示信息:';
+		if($this->isPicture($file))
+		{
+			
+			$this->isFile = 'true';
+			if($file["size"]<($this->MaxPicsize))
+			{
+				if($file["error"]>0)
+				{
+					$hit_mes .= "上传错误,错误类型为:".$file["error"].';';
+				}
+				else
+				{
+					//$file["name"] = $this->escape($file["name"]);
+					
+					$hit_mes .= "图片名称:".$file["name"].";";
+					//$hit_mes .= "图片类型:".$file["type"].";";
+					//$hit_mes .= "图片大小:".sprintf("%.2f",($file["size"]/1024))."kb".";";
+					//$hit_mes .= "临时存储名称:".$file["tmp_name"].";";
+				}
+				
+				$file["name"] = $this->escape($file["name"]);
+			
+				
+				if(file_exists($this->picfile_dir.$file["name"]))
+				{
+					$hit_mes .= "该文件已存在;";
+				}
+				else
+				{
+					$this->fileName = $file["name"];
+					$this->fileDir  = $this->picfile_dir;
+					$this->fileType = 'picture';
+					$this->isUpload = 'true';
+					move_uploaded_file($file["tmp_name"],$this->picfile_dir.$file["name"]);
+					//$hit_mes .= "图片文件已上传到".$this->picfile_dir."文件夹";
+				}
+			}
+			else
+			{
+				$hit_mes .= '上传的图片文件不符合要求;';
+			}
+			
+		}
+		else if($this->isAudio($file))
+		{
+			
+			$this->isFile = 'true';
+			if($file["error"]>0)
+				{
+					$hit_mes .= "上传错误,错误类型为:".$file["error"].';';
+				}
+			else
+				{
+					//$file["name"] = $this->escape($file["name"]);
+					
+					$hit_mes .= "音频名称:".$file["name"].";";
+					//$hit_mes .= "音频类型:".$file["type"].";";
+					//$hit_mes .= "音频大小:".sprintf("%.2f",($file["size"]/1024))."kb".";";
+					//$hit_mes .= "临时存储名称:".$file["tmp_name"].";";
+				}
+			
+			if($file['type']=='audio/wav')
+			{
+				$mus_type = '.wav';
+
+			}
+			else if($file['type']=='audio/mp3')
+			{
+				$mus_type = '.mp3';
+			}
+			else if($file['type']=='audio/mpeg')
+			{
+				$mus_type = '.mpeg';
+			}
+			
+				//音乐id为该音乐在数据库中的排序位置
+			if($radio)
+			{
+				$this->fileType = 'radio';
+				$sql_page_total = "select *from siyeradio_info";
+			}
+			else
+			{
+				$this->fileType = 'music';
+				$sql_page_total = "select *from siyemus_info";
+			}
+				
+				$total = $dao->fetchCou($sql_page_total);
+				$music_id = $total+1;
+				if($total>500)
+				{
+					$hit_mes .= "音频已达数目设定上限，暂时无法继续上传;";
+					
+					$res['hit_mes']   = $hit_mes;
+					$res['is_file']   = $this->isFile;
+					$res['is_upload'] = $this->isUpload;
+					$res['file_type'] = $this->fileType;
+					$res['file_dir']  = $this->fileDir;
+					$res['file_name'] = $this->fileName;
+					$res['isRadio']   = $radio;
+					echo json_encode($res);
+					exit;
+				}
+			
+			$file['name'] = str_replace(".mp3","",$file['name']);
+			if($file['name']=="")
+			{
+				$file['name']=".mp3";
+			}
+			
+			if(file_exists($this->musfile_dir.$file["name"])&&(!$radio))
+				{
+					$hit_mes .= "该音乐文件已存在;";
+				}
+			else if(file_exists($this->radiofile_dir.$file["name"])&&$radio)
+				{
+					$hit_mes .= "该电台文件已存在;";
+				}
+			else
+				{
+					
+					
+					if($radio&&$file["size"]<($this->MaxAudsize*1))
+					{
+						move_uploaded_file($file["tmp_name"],$this->radiofile_dir.$music_id.".mp3");
+						$hit_mes .= '电台文件上传成功;';
+						$this->fileDir = $this->radiofile_dir;
+						$this->isUpload = 'true';
+						$this->fileName = $music_id;
+			
+						$sql = "insert into siyeradio_info(id,radioname,radiotype) values('{$music_id}','{$file['name']}','$mus_type')";
+						
+						$num = $dao->query($sql);
+
+						if($num)
+						{
+							$hit_mes .= '数据库存储电台音频信息成功;';
+						}
+						else
+						{
+							$hit_mes .= '数据库存储电台音频信息失败;';
+						}
+					}
+					else if($file["size"]<($this->MaxAudsize*1))
+					{
+						
+						move_uploaded_file($file["tmp_name"],$this->musfile_dir.$music_id.".mp3");
+						$hit_mes .= '音乐文件上传成功;';
+						$this->fileDir = $this->musfile_dir;
+						$this->isUpload = 'true';
+						$this->fileName = $music_id;
+						//$res['hit_mes'] .= "图片文件已上传到".$this->picfile_dir."文件夹";
+						$sql = "insert into siyemus_info(id,musname,mustype) values('{$music_id}','{$file['name']}','$mus_type')";
+						
+						$num = $dao->query($sql);
+
+						if($num)
+						{
+							$hit_mes .= '数据库存储音乐音频信息成功;';
+						}
+						else
+						{
+							$hit_mes .= '数据库存储音乐音频信息失败;';
+						}
+						
+					}
+					
+			
+				}
+		}
+		
+		$res['hit_mes']   = $hit_mes;
+		$res['is_file']   = $this->isFile;
+		$res['is_upload'] = $this->isUpload;
+		$res['file_type'] = $this->fileType;
+		$res['file_dir']  = $this->fileDir;
+		$res['file_name'] = $this->fileName;
+		
+		echo json_encode($res);
+		exit;
+	}
+}
+
+
+
+$upload = new Upload();
+//$password = '石悦';
+$upload->isBlank($picfile,$musfile,$radiofile,$password);
+//$upload->isPicture($password);
+
+if($password)
+{
+	if($upload->isPass($password,$dao_mysqli))
+	{
+		$res['hit_mes']   = 'true';
+	}
+	else
+	{
+		$res['hit_mes']   = 'false';
+	}
+	
+	echo json_encode($res);
 	exit;
 }
 
-//为带有中文名称的文件进行编码设置
-function escape($str) {
-	//str_replace("world","Shanghai","Hello world!");
-  $a = str_replace('\\', '%', substr(json_encode($str), 1, -1));
-  $b = str_replace('%','a',$a);
-	return $b;
-}
-function unescape($str) {
-  return json_decode('"'.str_replace('%', '\\', $str).'"');
-}
-if (($ajax_picfile=='')&&($ajax_musfile=='')&&($ajax_radiofile==''))
-	{
-		//echo "<script>location.href='index.php';
-			//</script>";
-		//exit();
-	    
-		$hit_mes = '没有选择文件';
-	    $mesinfo.= $hit_mes."</hit_mes>";
-	    $mesinfo .= "<file_name>"."no_file"."</file_name>";
-	    $mesinfo .= "<is_file>".'no_file'."</is_file>";
-		$mesinfo .= "<hit_mus>".$hit_mus."</hit_mus>";
-		$mesinfo .= "<mus_id>".'无音乐ID'."</mus_id>";
-		$mesinfo .= "<mus_type>".$mus_type."</mus_type>";
-		
-	    $mesinfo.= "</meses>";
-	    echo $mesinfo;
-	    //echo $hit_mes;
-	    exit;
-	}
+//$fileObj = $picfile||$musfile||$radiofile;
+//$fileObj = $musfile;
 
-if($ajax_picfile
-	   &&(($ajax_picfile["type"]=="image/gif")
-		||($ajax_picfile["type"]=="image/jpeg")
-		||($ajax_picfile["type"]=="image/pjpeg")
-		||($ajax_picfile["type"]=="image/png"))
-	   &&($ajax_picfile["size"]<$MaxPicsize)
-	  )
-	{
-		if($ajax_picfile["error"]>0)
-		{
-			$hit_mes .= "上传错误,错误类型为:".$ajax_picfile.["error"];
-		}
-			
-		else
-		{
-			//$ajax_picfile["name"] = escape($ajax_picfile["name"]);
-			//$hit_mes .= "上传文件类型:"."picture;";
-			$hit_mes .= "图片名称:".$ajax_picfile["name"].";";
-//			$hit_mes .= "图片类型:".$ajax_picfile["type"].";";
-//			$hit_mes .= "图片大小:".sprintf("%.2f",($ajax_picfile["size"]/1024))."kb".";";
-//			$hit_mes .= "临时存储名称:".$ajax_picfile["tmp_name"].";";
-		}
-	
-		$ajax_picfile["name"] = escape($ajax_picfile["name"]);
-		if(file_exists($picfile_dir.$ajax_picfile["name"]))
-		{
-			
-			$is_file = 'true';
-			move_uploaded_file($ajax_picfile["tmp_name"],$picfile_dir.$ajax_picfile["name"]);
-			//$ajax_picfile["name"] = unescape($ajax_picfile["name"]);
-			$hit_mes .= "原图片文件".$ajax_picfile["name"]."已重新上传";
-
-		}
-		else
-		{
-			//$ajax_picfile["name"] = escape($ajax_picfile["name"]);
-			$is_file = 'true';
-			move_uploaded_file($ajax_picfile["tmp_name"],$picfile_dir.$ajax_picfile["name"]);
-			$hit_mes .= "图片文件已上传到".$picfile_dir."文件夹";
-			
-		}
-	}
-	else if($ajax_picfile)
-	{
-		$hit_mes .= "上传的图片文件不符合要求";
-	}
-
-
-//$MaxMussize = 500;
-if($ajax_musfile
-	   &&(($ajax_musfile['type']=='audio/mp3')
-		  ||($ajax_musfile['type']=='audio/wav')
-		  ||($ajax_musfile['type']=='audio/mpeg'))
-	   &&($ajax_musfile['size']<($MaxMussize))
-	  )
-	{
-		if($ajax_musfile['type']=='audio/wav')
-		{
-			$mus_type = '.wav';
-			
-		}
-		else if($ajax_musfile['type']=='audio/mp3')
-		{
-			$mus_type = '.mp3';
-		}
-		else if($ajax_musfile['type']=='audio/mpeg')
-		{
-			$mus_type = '.mpeg';
-		}
-		if($ajax_musfile['error']>0)
-		{
-			$hit_mes .= "上传音频错误,错误类型为:".$ajax_musfile['error'];
-		
-		}
-		else
-		{
-			
-			//$hit_mes .="上传文件类型:".'music;';
-			$hit_mes .="音乐名称:".$ajax_musfile["name"].';';
-			$hit_mes .="音频类型:".$ajax_musfile["type"].';';
-//			//sprintf("%.2f",$num);
-			$hit_mes .="音频大小:".sprintf("%.2f",($ajax_musfile["size"]/1024000))."M".";";
-		    //$hit_mes .="音频临时存储名称:".$ajax_musfile["tmp_name"].";";
-		}
-		
-		//音乐id为该音乐在数据库中的排序位置
-		$sql_page_total = "select *from siyemus_info";
-        $total = $dao_mysqli->fetchCou($sql_page_total);
-		$music_id = $total+1;
-		if($total>50)
-		{
-			$hit_mes = '音乐列表已达设定上限，暂时无法继续上传';
-			$mesinfo.= $hit_mes."</hit_mes>";
-			$mesinfo .= "<file_name>"."no_file"."</file_name>";
-			$mesinfo .= "<hit_mus>".$hit_mus."</hit_mus>";
-			$mesinfo .= "<mus_id>".$music_id."</mus_id>";
-			$mesinfo .= "<mus_type>".$mus_type."</mus_type>";
-			$mesinfo .= "<is_file>".$is_file."</is_file>";
-			$mesinfo.= "</meses>";
-			echo $mesinfo;
-			exit;
-		}
-		
-		//$ajax_musfile["name"] = escape($ajax_musfile["name"]);
-		//mb_convert_encoding($name,"gbk", "utf-8")
-		//$music_id = mb_convert_encoding($music_id,"gbk","utf-8");
-		//$music_id = escape($music_id);
-		$ajax_musfile['name'] = str_replace(".mp3","",$ajax_musfile['name']);
-		if($ajax_musfile['name']=="")
-		{
-			$ajax_musfile['name']=".mp3";
-		}
-		if(file_exists($musfile_dir.$ajax_musfile["name"]))
-		{
-			$is_file = 'true';
-			move_uploaded_file($ajax_musfile["tmp_name"],$musfile_dir.$music_id.".mp3");
-			
-			$sql = "insert into siyemus_info(id,musname,mustype) values('{$music_id}','{$ajax_musfile['name']}','$mus_type')";
-			
-			$res = $dao_mysqli->query($sql);
-			
-			if($res)
-			{
-				$hit_mus = '音乐上传成功';
-			}
-			else
-			{
-				$hit_mus = '音乐上传失败';
-			}
-			
-			$hit_mes .= "原音频文件".$ajax_musfile["name"]."已重新上传";
-			//echo "<script>location.href='index.php?pic_file=re_upload';
-			//</script>";
-		}
-		else
-		{
-			$is_file = 'true';
-		  //mb_convert_encoding();
-			move_uploaded_file($ajax_musfile["tmp_name"],$musfile_dir.$music_id.".mp3");
-			$sql = "insert into siyemus_info(id,musname,mustype) values('{$music_id}','{$ajax_musfile['name']}','$mus_type')";
-			
-			$res = $dao_mysqli->query($sql);
-			
-			if($res)
-			{
-				$hit_mus = '音乐上传成功';
-			}
-			else
-			{
-				$hit_mus = '音乐上传失败';
-			}
-			//$hit_mes .= "音频文件已上传到".$musfile_dir."文件夹";
-		}
-	}
-else if($ajax_musfile)
+if($radiofile)
 {
-	echo "我来了";
-	$hit_mes .= "上传的音频文件不符合要求";
-	
-			//$hit_mes .="上传文件类型:".'music;';
-			$hit_mes .= "音乐名称:".$ajax_musfile["name"].';';
-			$hit_mes .= "音频类型:".$ajax_musfile["type"].';';
-			//sprintf("%.2f",$num);
-			//$hit_mes .="音频大小:".sprintf("%.2f",($ajax_musfile["size"]/1024000))."M".";";
-		    //$hit_mes .="音频临时存储名称:".$ajax_musfile["tmp_name"].";";
-	        //$hit_mes .=$hit_mus;
+	$isRadio = true;
 }
 
-if($ajax_radiofile
-	   &&(($ajax_radiofile['type']=='audio/mp3')
-		  ||($ajax_radiofile['type']=='audio/wav')
-		  ||($ajax_radiofile['type']=='audio/mpeg'))
-	   &&($ajax_radiofile['size']<($MaxMussize*6))
-	  )
-	{
-		if($ajax_radiofile['type']=='audio/wav')
-		{
-			$mus_type = '.wav';
-			
-		}
-		else if($ajax_radiofile['type']=='audio/mp3')
-		{
-			$mus_type = '.mp3';
-		}
-		else if($ajax_radiofile['type']=='audio/mpeg')
-		{
-			$mus_type = '.mpeg';
-		}
-		if($ajax_radiofile['error']>0)
-		{
-			$hit_mes .= "上传音频错误,错误类型为:".$ajax_radiofile['error'];
-		
-		}
-		else
-		{
-			
-			//$hit_mes .="上传文件类型:".'music;';
-			$hit_mes .="音乐名称:".$ajax_radiofile["name"].';';
-			$hit_mes .="音频类型:".$ajax_radiofile["type"].';';
-//			//sprintf("%.2f",$num);
-			$hit_mes .="音频大小:".sprintf("%.2f",($ajax_radiofile["size"]/1024000))."M".";";
-		    //$hit_mes .="音频临时存储名称:".$ajax_musfile["tmp_name"].";";
-		}
-		
-		//音乐id为该音乐在数据库中的排序位置
-		$sql_page_total = "select *from siyeradio_info";
-        $total = $dao_mysqli->fetchCou($sql_page_total);
-		$music_id = $total+1;
-		if($total>50)
-		{
-			$hit_mes = '电台列表已达设定上限，暂时无法继续上传';
-			$mesinfo.= $hit_mes."</hit_mes>";
-			$mesinfo .= "<file_name>"."no_file"."</file_name>";
-			$mesinfo .= "<hit_mus>".$hit_mus."</hit_mus>";
-			$mesinfo .= "<mus_id>".$music_id."</mus_id>";
-			$mesinfo .= "<mus_type>".$mus_type."</mus_type>";
-			$mesinfo .= "<is_file>".$is_file."</is_file>";
-			$mesinfo.= "</meses>";
-			echo $mesinfo;
-			exit;
-		}
-		
-		//$ajax_musfile["name"] = escape($ajax_musfile["name"]);
-		//mb_convert_encoding($name,"gbk", "utf-8")
-		//$music_id = mb_convert_encoding($music_id,"gbk","utf-8");
-		//$music_id = escape($music_id);
-		$ajax_radiofile['name'] = str_replace(".mp3","",$ajax_radiofile['name']);
-		if($ajax_radiofile['name']=="")
-		{
-			$ajax_radiofile['name']=".mp3";
-		}
-		if(file_exists($radiofile_dir.$ajax_radiofile["name"]))
-		{
-			$is_file = 'true';
-			move_uploaded_file($ajax_radiofile["tmp_name"],$radiofile_dir.$music_id.".mp3");
-			
-			$sql = "insert into siyeradio_info(id,radioname,radiotype) values('{$music_id}','{$ajax_radiofile['name']}','$mus_type')";
-			
-			$res = $dao_mysqli->query($sql);
-			
-			if($res)
-			{
-				$hit_mus = '电台上传成功';
-			}
-			else
-			{
-				$hit_mus = '电台上传失败';
-			}
-			
-			$hit_mes .= "原音频文件".$ajax_radiofile["name"]."已重新上传";
-			//echo "<script>location.href='index.php?pic_file=re_upload';
-			//</script>";
-		}
-		else
-		{
-			$is_file = 'true';
-		  //mb_convert_encoding();
-			move_uploaded_file($ajax_radiofile["tmp_name"],$radiofile_dir.$music_id.".mp3");
-			$sql = "insert into siyeradio_info(id,radioname,radiotype) values('{$music_id}','{$ajax_radiofile['name']}','$mus_type')";
-			
-			$res = $dao_mysqli->query($sql);
-			
-			if($res)
-			{
-				$hit_mus = '电台上传成功';
-			}
-			else
-			{
-				$hit_mus = '电台上传失败';
-			}
-			//$hit_mes .= "音频文件已上传到".$musfile_dir."文件夹";
-		}
-	}
-else if($ajax_radiofile)
+if($musfile)
 {
-	//$hit_mes .= "上传的音频文件不符合要求";
-	
-			//$hit_mes .="上传文件类型:".'music;';
-			$hit_mes .="音乐名称:".$ajax_radiofile["name"].';';
-			$hit_mes .="音频类型:".$ajax_radiofile["type"].';';
-			//sprintf("%.2f",$num);
-			//$hit_mes .="音频大小:".sprintf("%.2f",($ajax_musfile["size"]/1024000))."M".";";
-		    //$hit_mes .="音频临时存储名称:".$ajax_musfile["tmp_name"].";";
-	        //$hit_mes .=$hit_mus;
+	$upload->uploadFile($musfile,$dao_mysqli,$isRadio);
 }
-//echo $_FILES['ajax_picfile']['type']."<br/>";
-//<getter>{$row['getter']}</getter>
-$mesinfo .= $hit_mes."</hit_mes>";
-if($ajax_picfile)
+else if($radiofile)
 {
-	$mesinfo .= "<file_name>".$ajax_picfile['name']."</file_name>";
+	$upload->uploadFile($radiofile,$dao_mysqli,$isRadio);
 }
-else if($ajax_musfile)
-{
-	$mesinfo .= "<file_name>".$ajax_musfile['name']."</file_name>";
-}
-else if($ajax_radiofile)
-{
-	$mesinfo .= "<file_name>".$ajax_radiofile['name']."</file_name>";
-}
-$mesinfo .= "<is_file>".$is_file."</is_file>";
-$mesinfo .= "<hit_mus>".$hit_mus."</hit_mus>";
-$mesinfo .= "<mus_id>".$music_id."</mus_id>";
-$mesinfo .= "<mus_type>".$mus_type."</mus_type>";
-$mesinfo .= "</meses>";
 
-echo $mesinfo;
-//echo $hit_mes;
+
 ?>

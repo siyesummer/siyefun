@@ -1,3 +1,6 @@
+﻿<?php
+
+?>
 <!doctype html>
 <html>
 <head>
@@ -26,7 +29,7 @@
 			</div>
 			<br/>
 		<form action="" method="post" enctype="multipart/form-data">
-			<label for="mus_file">上传音乐</label>
+			&nbsp;<label for="mus_file">上传音乐</label>
 			<input type="file" id="mus_file" name="mus_one" value="选择音频">
 		<!--	<input type="submit" value="提交音频">-->
 			<input type="button" value="ajax音乐上传" id="ajax_mus" onClick="ajax_fileup('music')">
@@ -42,13 +45,8 @@
 		</form>
 		<br/>
 		<input type="text" width="200px" placeholder="Enter电台上传口令" id="summer"><span id='hit_summer'></span>
-		
-	</div>
-	<br/>
-	<div style="text-align: center;margin: 0 auto;">
 		<audio  src="" id="show_mus"></audio>
 	</div>
-	
-<script src="upload.js" type="text/javascript"></script>
+<script src="UploadFile.js" type="text/javascript"></script>
 </body>
 </html>
