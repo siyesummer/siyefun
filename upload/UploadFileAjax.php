@@ -1,6 +1,6 @@
 <?php
 //header("Content-Type:text/xml;charset=utf-8");
-require 'lib/init.php';
+require '../lib/init.php';
 
 $picfile = isset($_FILES["ajax_picfile"])?$_FILES['ajax_picfile']:'';
 $musfile = isset($_FILES["ajax_musfile"])?$_FILES['ajax_musfile']:'';
