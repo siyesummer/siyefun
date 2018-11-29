@@ -83,7 +83,7 @@ function send_ac()
 					var mes = myxmlhttp.responseText;
 					//console.log(mes);
 					var mesRes_value = eval("("+mes+")");
-					console.log(mesRes_value);
+					//console.log(mesRes_value);
 					var file_type = mesRes_value.file_type;
 					var is_file = mesRes_value.is_file;
 					var is_upload = mesRes_value.is_upload;
