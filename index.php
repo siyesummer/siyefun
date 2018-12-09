@@ -7,7 +7,7 @@
 <title>四叶音乐</title>
 
 <link rel="stylesheet" href="siyeMusic.css" type="text/css">
-
+<link rel="stylesheet" href="comment.css" type="text/css">
 </head>
 <body>
 <div class="topbar">
@@ -118,6 +118,68 @@
 		</div>
 	</div>
 </div>
+<div class="area_commet">
+
+		<div class="commet_left">
+			<h3 style="text-align: center">请选择音频</h3>
+			
+			<hr/>
+
+		</div>
+		
+		<div class="commet_right" style="" id=''>
+			<div style="text-align: right;background-color:transparent" class="commet_title" >
+				<span><a href="javascript:void(0)"  style="text-decoration: none;color: silver;"><span id="hit_look">收起留言</span></a></span>  
+				<span><a href="javascript:void(0)" onClick="commet_init()" style="text-decoration: none;color: silver;">刷新留言</a></span>  
+				<span><a href="javascript:void(0)" style="text-decoration: none;color: silver;">留下留言</a></span>
+			</div>
+			
+			
+			
+			<div style="display: none" id="is_wri" class="">
+			<textarea rows="3"  style="resize: none;font-size: 18px;overflow:auto;width: 718px;" name="message" id="wri_mes" placeholder="兰因絮果" class="commet_textarea"></textarea><br/>
+			<input type="button" value="留下信息" class="commet_button" style="float: left">   
+				<span id="wri_hit"></span>
+				
+			<input type="button" value="取消" class="commet_button"  style="float: right">
+				<span id="wri_num" style="float: right;">140</span>
+		    </div>
+		</div>
+		
+		
+		<div class="commet_message" id="is_show">
+			<div id="total_commet">
+		    </div>
+		    <br/>
+			
+			<div class="commet_changepage">
+					<ul>
+						<li><a href="javascript:void(0)" ><font class="commet_button">首页</font></a></li>
+						<li><a href="javascript:void(0)" ><div class="commet_beforebutton" style="vertical-align:middle"><span>上一页</span></div></a></li>
+						<li><a href="javascript:void(0)" ><div class="commet_nextbutton" style="vertical-align:middle"><span>下一页 </span></div></a></li>
+						<li><a href="javascript:void(0)"><font class="commet_button">尾页</font></a></li>
+						<li>
+							<span id="hit_jump"></span>
+							<input type="text" value="" style="width: 50px;" id="select_page"><input type="button" value="跳转" class="commet_button" id="click_page">
+							
+						</li>
+						
+						<li>当前为第<span id="page_now"></span>页</li>
+						<li>总共有<span id="page_final"></span>页</li>
+						
+					</ul>
+		   </div>
+			<br/>
+		   
+			
+			
+		
+
+			
+		</div>
+		
+		
+	</div>
 
 <div class=""></div>
 <div class="bg_66"></div>
@@ -127,6 +189,7 @@
 <script src="musProgress.js"></script>
 <script src="musPlay.js"></script>
 <!--<script src="siyeMusic.js"></script>-->
+<script src="commentArea.js"></script>
 <script src="index.js"></script>
 <script src="musicJsonList.js"></script>
 </body>

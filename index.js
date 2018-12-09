@@ -13,6 +13,7 @@ var $btn_vol     = $(".curr .btn_vol");
 
 var progress = new Progress($progressbar,$cur,$btn);//进度条对象
 var volPro = new Progress($curr_bg,$curr,$btn_vol);//音量对象
+var comment = new Comment();//评论对象
 var lyr;//歌词对象
 var isLyr;//是否有歌词
 var runindex = -2;//歌词滚动标记
@@ -96,6 +97,21 @@ $("#mus_list").delegate("tr","click",function(){
 	//console.log(isLyr);
 	musplay.selectMusic(index,message);
 	musplay.musState();
+	if(musList.audioType=='music')
+		{
+			comment.radioID = '';
+			comment.musID = message.id;
+			comment.audioType = 'music';
+			comment.lookCmmt('music',message.id);
+		}
+	else if(musList.audioType=='radio')
+		{
+			comment.musID = '';
+			comment.radioID = message.id;
+			comment.audioType = 'radio';
+			comment.lookCmmt('radio',message.id);
+		}
+	
 
 });
 
@@ -212,10 +228,123 @@ $(".topmenulist a").eq(1).click(function(){
 	console.log("音乐频道首页");
 });
 
-//电台频道
+//音乐频道
 $(".topmenulist a").eq(2).click(function(){
 	musList.radioInit();
 	console.log("心灵砒霜首页");
 });
+
+//评论区切换
+$(".commet_title a").eq(0).click(function(){
+	//console.log($("#total_commet").css("display"));
+	comment.commtToggle($("#total_commet"),$("#hit_look"));
+});
+//评论区刷新
+$(".commet_title a").eq(1).click(function(){
+	//console.log($("#total_commet").css("display"));
+	comment.changePage('top');
+});
+
+//留言框显示
+$(".commet_title a").eq(2).click(function(){
+	$("#is_wri").toggle();
+});
+$(".commet_button").eq(1).click(function(){
+	$("#is_wri").hide();
+});
+
+//发送留言
+$(".commet_button").eq(0).click(function(){
+	comment.sendStatus($("#wri_mes").get(0).value,$("#wri_hit"));
+});
+//留言字数
+$("#is_wri").keyup(function(){
+	//console.log($("#is_wri").get(0).value);
+	comment.cmmtNum($("#wri_mes").get(0).value,$("#wri_num"));
+});
+
+//评论翻页
+$(".commet_changepage ul a").eq(0).click(function(){
+	comment.changePage('top');
+
+});
+$(".commet_changepage ul a").eq(1).click(function(){
+	comment.changePage('before');
+
+});
+$(".commet_changepage ul a").eq(2).click(function(){
+	comment.changePage('next');
+
+});
+$(".commet_changepage ul a").eq(3).click(function(){
+	comment.changePage('final');
+
+});
+
+//评论跳页
+$("#select_page").keydown(function(event){
+	comment.jumpPage(event.keyCode,$("#select_page").get(0),$("#hit_jump"));
+});
+$("#click_page").click(function(){
+	comment.jumpPage('',$("#select_page").get(0),$("#hit_jump"),'jump');
+});
+
+function add(){
+	
+	var sum = 0;
+	for(var i=0;i<arguments.length;i++)
+		{
+			if(typeof arguments[i] == 'number')
+				{
+					sum += arguments[i];
+				}
+			else if (typeof {}.toString.call(arguments[i]) == 'string')
+				{
+					for(var j=0;j<arguments[i].length;j++)
+						{
+							sum += arguments[i][j];
+						}
+					
+				}
+				
+		}
+	var temp = function(){
+		if(arguments.length == 0)
+			{
+				return sum;
+			}
+		else
+			{
+				for(var i=0;i<arguments.length;i++)
+					{
+						if(typeof arguments[i] == 'number')
+							{
+								sum += arguments[i];
+							}
+						else if (typeof {}.toString.call(arguments[i]) == 'string')
+							{
+								for(var j=0;j<arguments[i].length;j++)
+									{
+										sum += arguments[i][j];
+									}
+
+							}
+
+					}
+				return temp;
+				
+			}
+	}
+	temp.valueOf = function(){
+		return sum;
+	}
+	temp.toString = function(){
+		return sum+'';
+	}
+	return temp;
+	
+}
+
+
 
 

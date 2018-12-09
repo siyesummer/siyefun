@@ -1,0 +1,242 @@
+/* CSS Document */
+.area_commet
+{
+	width: 1180px;
+	margin: 0 auto;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+　　　　border: 1px solid #ccc;/*跟进textarea背景颜色来定*/
+}
+
+.commet_left
+{
+	width: 455px;
+	height: 600px;
+    
+	float: left;
+	position: relative;
+}
+
+.commet_left a
+{
+	color: black;
+	text-decoration: none;
+}
+
+.commet_left span
+{
+	color: silver;
+}
+
+.commet_musproject
+{
+	
+}
+
+.commet_right
+{
+	width: 724px;
+	float: left;
+	
+	text-align: center;
+	position: relative;
+	padding-bottom: 10px;
+}
+
+.commet_right a
+{
+	color: silver;
+	text-decoration: none;
+	
+	
+}
+
+.commet_title
+{
+	padding-bottom: 10px;
+}
+
+.commet_textarea
+{
+	display: inline-block;
+	border-radius: 7px;
+}
+
+.commet_button
+{
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+
+  transition: all 0.5s;
+  cursor: pointer;
+ 
+}
+
+.commet_message
+{
+	width: 724px;
+	float: right;
+	border-left: 1px solid silver;
+	position: relative;
+	margin-top: 0px;
+}
+
+.commet_messagelist
+{
+	
+	float: left;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 10px;
+	border-bottom: 1px dashed silver;
+	padding-bottom: 10px;
+}
+
+.commet_picture
+{
+	width: 70px;
+	height: 50px;
+	float: left;
+	
+}
+
+.commet_picture img
+{
+	width: 50px;
+	height: 50px;
+	border-radius: 25px;
+	
+}
+
+.commet_text
+{
+	width: 613px;
+    float: left;
+	background-color: white;
+}
+
+.commet_textValue
+{
+	/*width: 653px;*/
+	/*height: 140px;*/
+	margin-bottom: 10px;
+}
+
+
+.commet_textDate
+{
+	/*width: 653px;*/
+	/*height: 35px;*/
+	margin-top: 10px;
+	/*background-color: aqua;*/
+	color: silver;
+}
+
+
+.commet_changepage
+{
+	text-align: center;
+	width: 724px;
+}
+.commet_changepage li
+{
+	list-style-type: none;
+	position: relative;
+	float: right;
+	width: 160px;
+	height: 30px;
+	margin-left: 0px;
+	padding: 5px;
+}
+.commet_changepage a
+{
+	font-size: 20px;
+}
+
+.commet_nextbutton 
+{
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+
+  transition: all 0.5s;
+  cursor: pointer;
+ 
+}
+.commet_nextbutton span 
+{
+  
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+
+
+.commet_nextbutton span:after {
+  content: '☛';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.commet_nextbutton:hover span {
+  padding-right: 25px;
+}
+
+.commet_nextbutton:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
+
+.commet_beforebutton 
+{
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+
+  transition: all 0.5s;
+  cursor: pointer;
+ 
+}
+
+.commet_beforebutton span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.commet_beforebutton span:after {
+  content: '☚';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  left: -20px;
+  transition: 0.5s;
+}
+
+.commet_beforebutton:hover span {
+  padding-left: 25px;
+}
+
+.commet_beforebutton:hover span:after {
+  opacity: 1;
+  left: 0;
+}
