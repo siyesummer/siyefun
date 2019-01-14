@@ -10,7 +10,7 @@
 		this.path = path;
 
 		},
-		lyricText:[],//存储歌词文件歌词内容
+		lyricText:[],//存储歌词文件歌词内容/用smartgit改注释
 		lyricTime:[],//存储歌词文件歌词时间戳
 		lyricIndex:-1,//标记歌词当前行
 		first:true,//标记当前歌词是否第一次加载
